@@ -25,7 +25,7 @@ sudo apt -y update
 sudo apt -y upgrade
 sudo apt -y dist-upgrade
 sudo apt autoremove
-sudo raspi-config (go to the very bottom where it says 'camera' and hit enter)
+sudo raspi-config (go to '5 Enable Camera' and hit enter)
 ```
 
 ### Installing
