@@ -15,7 +15,8 @@ What Hardware you need
 Raspberry Pi (tested on 1 b+)
 SD Card (tested on Raspbian Stretch)
 Sufficient Power Supply (tested on 2A)
-Infrared Nightvision Camera for Raspberry Pi (just search Raspberry Pi Infrared Camera, you can have a ~70° and a 130° angle camera): 
+Infrared Nightvision Camera for Raspberry Pi 
+(just search Raspberry Pi Infrared Camera, you can have a ~70° and a 130° angle camera)
 ```
 
 What things you need to install the software and how to install them
@@ -31,9 +32,19 @@ sudo raspi-config (go to the very bottom where it says 'camera' and hit enter)
 
 #### Hardware
 
-Coming soon...
+Assemble your nightvision camera.
+
+Next, solder the male part of a female to male jumper cable to the small hole to the right of the camera.
+
+To finish off, you only need to plug the female part to a GPIO port that can be controlled via software.
+
+The solution I chose was the GPIO nearest to the USB, but on the far side of the Raspberry Pi (Pin 40). If you choose another port, you have to adapt that in the switchToDayVision and switchToNightVision.
 
 #### Software
+
+#### Google Drive API
+
+Follow the guide [Drive API v3](https://developers.google.com/drive/api/v3/quickstart/python/) and setup Google's sample to check if everything is working. Afterwards just replace the sample by the code in this repository, also stated in the following section.
 
 #### Raspberry Pi
 
@@ -52,15 +63,17 @@ Copy the three python files to your system and move them to the directory /home/
 mv *.py /home/pi/Documents/Python_Projects/nightvision_camera
 ```
 
+Also don't forget to put your credentials.json and token.json from Google in this same working directory
+
+```
+mv *.json /home/pi/Documents/Python_Projects/nightvision_camera
+```
+
 Install the crontab by copying all the contents of the crontab file (from the repository) into the file opening after the following command
 
 ```
 sudo crontab -e
 ```
-
-#### Google Drive API
-
-Coming soon...
 
 ## Running the tests
 
@@ -69,7 +82,7 @@ Look at your Google Drive Account. All pictures will be uploaded there in a time
 
 ## Built With
 
-* [Python 2.7](https://www.python.org/downloads/release/python-2715/) - Python 2.7.15
+* [Python 2.7.15](https://www.python.org/downloads/release/python-2715/)
 
 
 ## Authors
