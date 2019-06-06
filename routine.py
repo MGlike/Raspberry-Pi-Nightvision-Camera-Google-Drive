@@ -24,21 +24,26 @@ def authenticate():
     # The file token.json stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
     # time.
+    print("Authenticating on Google Drive")
     store = file.Storage('/home/pi/Documents/Python_Projects/nightvision_camera/token.json')
     creds = store.get()
     if not creds or creds.invalid:
         flow = client.flow_from_clientsecrets('/home/pi/Documents/Python_Projects/nightvision_camera/credentials.json', SCOPES)
         creds = tools.run_flow(flow, store)
-    session = build('drive', 'v3', http=creds.authorize(Http()))
+    try:
+        session = build('drive', 'v3', http=creds.authorize(Http()))
+    except:
+	print("Could not connect to Drive for authentication")
+        os.system('sudo shutdown -r now')
     return session
 
 def take_a_picture():
     camera = PiCamera()
     camera.rotation = 180
     camera.resolution = (1280, 720)
-    print("Picture will be taken")
+    print("Taking picture now")
     fileNameOfPhoto = time.strftime("%Y%m%d-%H%M%S", time.localtime()) + ".jpg"
-    pathOfPhoto = "/home/pi/Pictures/" + fileNameOfPhoto
+    pathOfPhoto = "/var/pictures/" + fileNameOfPhoto
     camera.capture(pathOfPhoto)
     return pathOfPhoto
 
@@ -49,18 +54,18 @@ def upload_file(session, pathOfPhoto):
     file = session.files().create(body=file_metadata,
                                          media_body=media,
                                         fields='id').execute()
-    print ('Uploading File ID: %s' % file.get('id'))
+    print ('Uploading File ID: %s to Google Drive' % file.get('id'))
 
 def deleteEveryPhotoFromSDcard():
-    print("Deleting all pictures from SD card")
-    pathToPictureFolder = '/home/pi/Pictures'
+    print("Emptying pictures from RAM")
+    pathToPictureFolder = '/var/pictures'
     try:
         for aFile in os.listdir(pathToPictureFolder):
             aFilePath = os.path.join(pathToPictureFolder, aFile)
             if os.path.isfile(aFilePath):
                 os.unlink(aFilePath)
     except:
-        print ('Pictures starting with %s could not be removed from the SD card.' % aFile)
+        print ('Pictures starting with %s could not be removed from RAM.' % aFile)
 
 def deleteEveryPhotoFromDrive(session):
     pictureIndex = 0
@@ -76,7 +81,7 @@ def deleteEveryPhotoFromDrive(session):
             pictureIndex += 1
             currentItem = u'{0}'.format(item['id'])
             if pictureIndex > 10:
-                print("Deleting File ID: %s" % currentItem)
+                print("Deleting older picture on Google Drive with File ID: %s" % currentItem)
                 session.files().delete(fileId=currentItem).execute()
 
 if __name__ == '__main__':
