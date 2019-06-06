@@ -1,9 +1,13 @@
 # Raspberry-Pi-Nightvision-Camera-Google-Drive
 With this project you are routinely able to take pictures in a given time period and upload them to Google Drive.
 
-The camera will automatically switch between nightmode and daymode as soon as you have connected your camera to your Raspberry Pi GPIO.
+The camera already automatically switches between day and nightmode (at least in newer camera models).
 
-All taken pictures on your Raspberry Pi will be deleted after a taken picture. Furthermore, all oldest files will then be deleted from your Google Drive, so that only the currently 10 most recent photos will be held online.
+All taken pictures on your Raspberry Pi will be deleted (from the RAM-Disk) after a taken picture. Furthermore, all oldest files will then be deleted from your Google Drive, so that only the currently 10 most recent photos will be held online.
+
+To minimize failures during runtime, write access to the SD card is minimized by using the RAM-Disk. Furthermore, the Raspberry Pi is rebooted periodically and also in case of an connection/authentication failure.
+
+To further reduce failures you could disable swapping, setup a hardware watchdog (powered by the Broadcom BCM2708 Chip) that checks for systems' consistent functionality and maybe also cool the system/camera actively or passively.
 
 
 ## Getting Started
@@ -16,7 +20,7 @@ Raspberry Pi (tested on 1 b+)
 SD Card (tested on Raspbian Stretch)
 Sufficient Power Supply (tested on 2A)
 Infrared Nightvision Camera for Raspberry Pi 
-(just search Raspberry Pi Infrared Camera, you can have a ~70° and a 130° angle camera)
+(just search Raspberry Pi Infrared Camera, you can have a ~70° and a 130° angle camera; I used the widescreen camera)
 ```
 
 What things you need to install the software and how to install them
@@ -32,13 +36,7 @@ sudo raspi-config (go to '5 Enable Camera' and hit enter)
 
 #### Hardware
 
-Assemble your nightvision camera.
-
-Next, solder the male part of a female to male jumper cable to the small hole to the right of the camera.
-
-To finish off, you only need to plug the female part to a GPIO port that can be controlled via software.
-
-The solution I chose was the GPIO nearest to the USB, but on the far side of the Raspberry Pi (Pin 40). If you choose another port, you have to adapt that in the switchToDayVision and switchToNightVision.
+Assemble your nightvision camera and plug it into the Raspberry Pi.
 
 #### Software
 
@@ -75,9 +73,20 @@ Install the crontab by copying all the contents of the crontab file (from the re
 sudo crontab -e
 ```
 
+Install the RAM-Disk by copying and pasting the content of the file fstab to your /etc/fstab. Don't forget to create the /var/pictures folder and set the permission according to the following. The RAM-Disk minimizes any access to the SD card.
+
+```
+sudo mv fstab /etc/fstab
+sudo mkdir /var/pictures
+sudo chown -R pi:pi /var/pictures
+sudo chmod 0775 /var/pictures
+sudo reboot
+```
+
 ## Running the tests
 
-Look at your Google Drive Account. All pictures will be uploaded there in a time frame of 15 minutes.
+Look at your Google Drive Account. All pictures will be uploaded there in a time frame of about 15 minutes and after a reboot of the device.
+Of course you can also run the routine.py manually to upload a picture.
 
 
 ## Built With
